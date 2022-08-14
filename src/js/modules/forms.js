@@ -65,6 +65,19 @@ const forms = () => {
       statusMessage.appendChild(textMessage);
 
       const formData = new FormData(item);
+      if (item.hasAttribute("data-calc")) {
+        const price = document.querySelector(".calc-price");
+        item.forEach((elem) => {
+          if (elem.value !== "") {
+            formData.append(elem.id, elem.value);
+          }
+        });
+        formData.append("price", price.textContent);
+      }
+
+      for (var value of formData.values()) {
+        console.log(value);
+      }
 
       let api;
       item.closest(".popup-design") || item.classList.contains("calc_form")
