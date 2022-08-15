@@ -6,6 +6,8 @@ const forms = () => {
     inputs = document.querySelectorAll("input"),
     upload = document.querySelectorAll('[name="upload"]');
 
+  let file;
+
   //checkNumInputs('input[name="user_phone"]');
 
   const message = {
@@ -34,6 +36,7 @@ const forms = () => {
   upload.forEach((item) => {
     item.addEventListener("input", () => {
       console.log(item.files[0]);
+      file = item.files[0];
       let dots;
       const arr = item.files[0].name.split(".");
       arr[0].length > 6 ? (dots = "...") : (dots = ".");
@@ -65,6 +68,9 @@ const forms = () => {
       statusMessage.appendChild(textMessage);
 
       const formData = new FormData(item);
+
+      let api;
+
       if (item.hasAttribute("data-calc")) {
         const price = document.querySelector(".calc-price");
         item.forEach((elem) => {
@@ -73,37 +79,50 @@ const forms = () => {
           }
         });
         formData.append("price", price.textContent);
+        api = path.question;
+        console.log(api);
+        postAllData();
       }
 
-      for (var value of formData.values()) {
-        console.log(value);
+      if (item.closest(".popup-design")) {
+        item.forEach((elem) => {
+          if (elem.value !== "") {
+            formData.append(elem.id, elem.value);
+          }
+        });
+        api = path.question;
+        console.log(api);
+        postAllData();
       }
 
-      let api;
       item.closest(".popup-design") || item.classList.contains("calc_form")
         ? (api = path.designer)
         : (api = path.question);
       console.log(api);
 
-      postData(api, formData)
-        .then((res) => {
-          console.log(res);
-          statusImg.setAttribute("src", message.ok);
-          textMessage.textContent = message.success;
-        })
-        .catch(() => {
-          statusImg.setAttribute("src", message.fail);
-          textMessage.textContent = message.failure;
-        })
-        .finally(() => {
-          clearInputs();
-          setTimeout(() => {
-            statusMessage.remove();
-            item.style.display = "block";
-            item.classList.remove("fadeOutUp");
-            item.classList.add("fadeInUp");
-          }, 5000);
-        });
+      function postAllData() {
+        postData(api, formData)
+          .then((res) => {
+            console.log(res);
+            statusImg.setAttribute("src", message.ok);
+            textMessage.textContent = message.success;
+          })
+          .catch(() => {
+            statusImg.setAttribute("src", message.fail);
+            textMessage.textContent = message.failure;
+          })
+          .finally(() => {
+            clearInputs();
+            setTimeout(() => {
+              statusMessage.remove();
+              item.style.display = "block";
+              item.classList.remove("fadeOutUp");
+              item.classList.add("fadeInUp");
+            }, 5000);
+          });
+      }
+
+      postAllData();
     });
   });
 };
